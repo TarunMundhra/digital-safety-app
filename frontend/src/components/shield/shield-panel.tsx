@@ -105,17 +105,18 @@ export function ShieldPanel() {
   const [reportSuccess, setReportSuccess] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const loadHotspots = async () => {
+    try {
+      const res = await fetch('/api/geo/hotspots?days=30');
+      const data = await res.json();
+      setHotspots(data.hotspots || []);
+    } catch {
+      setHotspots([]);
+    }
+  };
+
   // Fetch hotspots to display on the threat map
   useEffect(() => {
-    async function loadHotspots() {
-      try {
-        const res = await fetch('/api/geo/hotspots?days=30');
-        const data = await res.json();
-        setHotspots(data.hotspots || []);
-      } catch {
-        setHotspots([]);
-      }
-    }
     loadHotspots();
   }, []);
 
@@ -135,6 +136,7 @@ export function ShieldPanel() {
       });
       if (res.ok) {
         setReportSuccess(true);
+        loadHotspots();
         setTimeout(() => {
           setReportOpen(false);
           setReportSuccess(false);
@@ -252,6 +254,29 @@ export function ShieldPanel() {
                                   <SelectItem value="UP">Uttar Pradesh (UP)</SelectItem>
                                   <SelectItem value="RJ">Rajasthan (RJ)</SelectItem>
                                   <SelectItem value="GJ">Gujarat (GJ)</SelectItem>
+                                  <SelectItem value="AP">Andhra Pradesh (AP)</SelectItem>
+                                  <SelectItem value="AR">Arunachal Pradesh (AR)</SelectItem>
+                                  <SelectItem value="AS">Assam (AS)</SelectItem>
+                                  <SelectItem value="BR">Bihar (BR)</SelectItem>
+                                  <SelectItem value="CG">Chhattisgarh (CG)</SelectItem>
+                                  <SelectItem value="GA">Goa (GA)</SelectItem>
+                                  <SelectItem value="HR">Haryana (HR)</SelectItem>
+                                  <SelectItem value="HP">Himachal Pradesh (HP)</SelectItem>
+                                  <SelectItem value="JH">Jharkhand (JH)</SelectItem>
+                                  <SelectItem value="KL">Kerala (KL)</SelectItem>
+                                  <SelectItem value="MP">Madhya Pradesh (MP)</SelectItem>
+                                  <SelectItem value="MN">Manipur (MN)</SelectItem>
+                                  <SelectItem value="ML">Meghalaya (ML)</SelectItem>
+                                  <SelectItem value="MZ">Mizoram (MZ)</SelectItem>
+                                  <SelectItem value="NL">Nagaland (NL)</SelectItem>
+                                  <SelectItem value="OR">Odisha (OR)</SelectItem>
+                                  <SelectItem value="PB">Punjab (PB)</SelectItem>
+                                  <SelectItem value="SK">Sikkim (SK)</SelectItem>
+                                  <SelectItem value="TR">Tripura (TR)</SelectItem>
+                                  <SelectItem value="UK">Uttarakhand (UK)</SelectItem>
+                                  <SelectItem value="JK">Jammu and Kashmir (JK)</SelectItem>
+                                  <SelectItem value="CH">Chandigarh (CH)</SelectItem>
+                                  <SelectItem value="PY">Puducherry (PY)</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
