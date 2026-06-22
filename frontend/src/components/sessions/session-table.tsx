@@ -150,7 +150,7 @@ export function SessionTable() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <ScrollArea className="max-h-[500px]">
+          <ScrollArea className="h-[500px]">
             {loading ? (
               <div className="p-4 space-y-3">
                 {[...Array(5)].map((_, i) => (

@@ -76,7 +76,7 @@ export function RecentAlerts() {
   }
 
   return (
-    <ScrollArea className="max-h-96">
+    <ScrollArea className="h-96">
       <div className="space-y-2 pr-2">
         {alerts.map((alert, i) => {
           const badge = getRiskBadge(alert.riskScore);
