@@ -90,14 +90,8 @@ export function SessionTable() {
   });
 
   const handleFusion = async (sessionId: string) => {
-    try {
-      await fetch('/api/fusion/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callSessionId: sessionId }),
-      });
-      fetchSessions();
-    } catch { /* */ }
+    localStorage.setItem('fusion_target_session', sessionId);
+    window.location.hash = '#/fusion';
   };
 
   return (
@@ -178,11 +172,8 @@ export function SessionTable() {
                 </TableHeader>
                 <TableBody>
                   {filtered.map((session, i) => (
-                    <motion.tr
+                    <TableRow
                       key={session.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: i * 0.02 }}
                       className={`border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors ${
                         selectedSession?.id === session.id ? 'bg-slate-800/60' : ''
                       }`}
@@ -240,24 +231,30 @@ export function SessionTable() {
                       <TableCell className="py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1 justify-end">
                           <Button
-                            variant="ghost"
+                            variant={selectedSession?.id === session.id ? "default" : "outline"}
                             size="sm"
-                            className="h-7 px-2 text-[11px] text-slate-400 hover:text-emerald-400"
-                            onClick={() => setSelectedSession(selectedSession?.id === session.id ? null : session)}
+                            className="h-7 px-2 text-[11px] border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedSession(selectedSession?.id === session.id ? null : session);
+                            }}
                           >
                             <Eye className="h-3 w-3 mr-1" /> Details
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="default"
                             size="sm"
-                            className="h-7 px-2 text-[11px] text-slate-400 hover:text-amber-400"
-                            onClick={() => handleFusion(session.id)}
+                            className="h-7 px-2 text-[11px] bg-amber-500 hover:bg-amber-600 text-white"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFusion(session.id);
+                            }}
                           >
                             <GitMerge className="h-3 w-3 mr-1" /> Fusion
                           </Button>
                         </div>
                       </TableCell>
-                    </motion.tr>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>

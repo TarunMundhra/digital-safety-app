@@ -47,24 +47,36 @@ export function FusionPanel() {
       .finally(() => setSessionsLoading(false));
   }, []);
 
-  const runFusion = async () => {
-    if (!selectedId) return;
+  const runFusion = async (idToRun?: string) => {
+    const targetId = idToRun || selectedId;
+    if (!targetId) return;
     setLoading(true);
     setResult(null);
     try {
       const res = await fetch('/api/fusion/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ callSessionId: selectedId }),
+        body: JSON.stringify({ callSessionId: targetId }),
       });
       const data = await res.json();
       setResult(data);
     } catch {
-      setResult({ callSessionId: selectedId, originalRiskScore: 0, fusedRiskScore: 0, networkCorroborated: false, clusterId: null, recommendation: 'Analysis failed' });
+      setResult({ callSessionId: targetId, originalRiskScore: 0, fusedRiskScore: 0, networkCorroborated: false, clusterId: null, recommendation: 'Analysis failed' });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (sessionsLoading) return; // Wait until sessions are loaded
+    
+    const target = localStorage.getItem('fusion_target_session');
+    if (target) {
+      setSelectedId(target);
+      localStorage.removeItem('fusion_target_session');
+      runFusion(target);
+    }
+  }, [sessionsLoading]); // Run when sessions finish loading
 
   const selectedSession = sessions.find((s) => s.id === selectedId);
   const scoreDiff = result ? result.fusedRiskScore - result.originalRiskScore : 0;
@@ -106,7 +118,7 @@ export function FusionPanel() {
               </div>
               <div className="flex items-end">
                 <Button
-                  onClick={runFusion}
+                  onClick={() => runFusion()}
                   disabled={loading || !selectedId}
                   className="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white shadow-lg shadow-cyan-500/20"
                 >
