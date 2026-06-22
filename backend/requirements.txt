@@ -1,0 +1,16 @@
+fastapi==0.109.2
+uvicorn==0.27.1
+pydantic-settings==2.2.1
+SQLAlchemy==2.0.27
+psycopg2-binary==2.9.9
+alembic==1.13.1
+pgvector==0.2.4
+geoalchemy2==0.14.7
+fastembed==0.2.2
+networkx==3.2.1
+python-louvain==0.16
+reportlab==4.1.0
+redis==5.0.1
+prometheus-fastapi-instrumentator==6.1.0
+locust==2.27.0
+ollama==0.1.7
