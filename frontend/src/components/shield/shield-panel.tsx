@@ -24,6 +24,34 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+const renderNextStepText = (text: string) => {
+  const parts = text.split(/(cybercrime\.gov\.in|1930)/gi);
+  return parts.map((part, index) => {
+    if (part.toLowerCase() === 'cybercrime.gov.in') {
+      return <a key={index} href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="text-blue-400 underline hover:text-blue-300 transition-colors">{part}</a>;
+    }
+    if (part === '1930') {
+      return <a key={index} href="tel:1930" className="text-blue-400 underline hover:text-blue-300 transition-colors">{part}</a>;
+    }
+    return part;
+  });
+};
 
 interface AnalysisResult {
   verdict: string;
@@ -69,6 +97,12 @@ export function ShieldPanel() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [showHighRiskAlert, setShowHighRiskAlert] = useState(false);
   const [hotspots, setHotspots] = useState<any[]>([]);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportState, setReportState] = useState('');
+  const [reportType, setReportType] = useState('');
+  const [reportDesc, setReportDesc] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportSuccess, setReportSuccess] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Fetch hotspots to display on the threat map
@@ -84,6 +118,37 @@ export function ShieldPanel() {
     }
     loadHotspots();
   }, []);
+
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportState || !reportType || !reportDesc) return;
+    setReportLoading(true);
+    try {
+      const res = await fetch('/api/shield/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stateCode: reportState,
+          scamType: reportType,
+          description: reportDesc,
+        }),
+      });
+      if (res.ok) {
+        setReportSuccess(true);
+        setTimeout(() => {
+          setReportOpen(false);
+          setReportSuccess(false);
+          setReportState('');
+          setReportType('');
+          setReportDesc('');
+        }, 2000);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setReportLoading(false);
+    }
+  };
 
   const analyze = async (transcriptToAnalyze?: string) => {
     const text = transcriptToAnalyze || transcript;
@@ -148,9 +213,84 @@ export function ShieldPanel() {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
                 <Card className="bg-slate-900/50 border-slate-700/50">
                   <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="h-5 w-5 text-emerald-400" />
-                      <CardTitle className="text-base text-slate-200">Citizen Fraud Shield</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="h-5 w-5 text-emerald-400" />
+                        <CardTitle className="text-base text-slate-200">Citizen Fraud Shield</CardTitle>
+                      </div>
+                      
+                      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-7 text-[10px] bg-rose-500/10 text-rose-400 border-rose-500/30 hover:bg-rose-500/20 hover:text-rose-300 transition-colors">
+                            Report Incident
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-900 border-slate-700 text-slate-200 sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="text-rose-400 flex items-center gap-2">
+                              <AlertOctagon className="h-5 w-5" />
+                              Report a Scam Incident
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-400 text-xs">
+                              Your report will be anonymously added to the national threat intelligence map to help protect others.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <form onSubmit={handleReportSubmit} className="space-y-4 mt-2">
+                            <div className="space-y-2">
+                              <Label className="text-xs text-slate-300">State / Location</Label>
+                              <Select value={reportState} onValueChange={setReportState} required>
+                                <SelectTrigger className="bg-slate-800 border-slate-700 text-xs h-8">
+                                  <SelectValue placeholder="Select state..." />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-800 border-slate-700 text-slate-200 text-xs max-h-48">
+                                  <SelectItem value="DL">Delhi (DL)</SelectItem>
+                                  <SelectItem value="MH">Maharashtra (MH)</SelectItem>
+                                  <SelectItem value="KA">Karnataka (KA)</SelectItem>
+                                  <SelectItem value="TG">Telangana (TG)</SelectItem>
+                                  <SelectItem value="TN">Tamil Nadu (TN)</SelectItem>
+                                  <SelectItem value="WB">West Bengal (WB)</SelectItem>
+                                  <SelectItem value="UP">Uttar Pradesh (UP)</SelectItem>
+                                  <SelectItem value="RJ">Rajasthan (RJ)</SelectItem>
+                                  <SelectItem value="GJ">Gujarat (GJ)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs text-slate-300">Scam Type</Label>
+                              <Select value={reportType} onValueChange={setReportType} required>
+                                <SelectTrigger className="bg-slate-800 border-slate-700 text-xs h-8">
+                                  <SelectValue placeholder="Select type of scam..." />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-800 border-slate-700 text-slate-200 text-xs">
+                                  <SelectItem value="Digital Arrest">Digital Arrest / Coercion</SelectItem>
+                                  <SelectItem value="Impersonation">Govt/Police Impersonation</SelectItem>
+                                  <SelectItem value="Financial Demand">Financial / OTP Demand</SelectItem>
+                                  <SelectItem value="KYC Fraud">KYC / Document Fraud</SelectItem>
+                                  <SelectItem value="Other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs text-slate-300">Description</Label>
+                              <Textarea 
+                                required
+                                value={reportDesc}
+                                onChange={(e) => setReportDesc(e.target.value)}
+                                placeholder="Briefly describe what happened..." 
+                                className="h-20 bg-slate-800 border-slate-700 text-xs resize-none"
+                              />
+                            </div>
+                            <Button 
+                              type="submit" 
+                              disabled={reportLoading || !reportState || !reportType || !reportDesc || reportSuccess}
+                              className={`w-full h-8 text-xs transition-colors ${reportSuccess ? 'bg-emerald-600 hover:bg-emerald-600 text-white' : 'bg-rose-600 hover:bg-rose-700 text-white'}`}
+                            >
+                              {reportLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" /> : null}
+                              {reportSuccess ? 'Report Submitted Successfully' : 'Submit Report'}
+                            </Button>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
                       Enter the call transcript you received. Our AI engine will analyze it for known scam patterns.
@@ -332,7 +472,7 @@ export function ShieldPanel() {
                               {result.nextSteps.split('\n').filter(Boolean).map((step, i) => (
                                 <div key={i} className="flex items-start gap-1.5">
                                   <ChevronRight className="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" />
-                                  <span className="text-[11px] text-slate-300">{step.replace(/^\d+\.\s*/, '')}</span>
+                                  <span className="text-[11px] text-slate-300">{renderNextStepText(step.replace(/^\d+\.\s*/, ''))}</span>
                                 </div>
                               ))}
                             </div>

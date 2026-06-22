@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.db.database import get_db
-from app.db.models import CallSession, ScamSignal
+from app.db.models import CallSession, ScamSignal, VictimReport
 
 router = APIRouter()
 
@@ -169,3 +169,39 @@ def check_scam(req: ShieldRequest, db: Session = Depends(get_db)):
         ],
         "threatLevel": threat_level
     }
+
+class IncidentReportRequest(BaseModel):
+    stateCode: str
+    scamType: str
+    description: str
+
+@router.post("/report")
+def report_incident(req: IncidentReportRequest, db: Session = Depends(get_db)):
+    from app.services.geo_service import CITY_COORDINATES
+    
+    coords = CITY_COORDINATES.get(req.stateCode, CITY_COORDINATES["DL"])
+    
+    db_session = CallSession(
+        caller_number="REPORTED_INCIDENT",
+        state_code=req.stateCode,
+        claimed_identity=req.scamType,
+        duration_seconds=0,
+        is_video=False,
+        transcript_text=req.description,
+        risk_score=90,
+        status="citizen_reported"
+    )
+    db.add(db_session)
+    db.flush()
+    
+    location_wkt = f"POINT({coords['longitude']} {coords['latitude']})"
+    report = VictimReport(
+        location=location_wkt,
+        report_type=req.scamType,
+        severity=5,
+        related_call_session_id=db_session.id
+    )
+    db.add(report)
+    db.commit()
+    
+    return {"status": "success", "message": "Incident reported successfully."}

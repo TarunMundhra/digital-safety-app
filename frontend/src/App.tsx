@@ -133,9 +133,9 @@ export default function App() {
             <span>Digital Public Safety Intelligence</span>
           </div>
           <div className="flex items-center gap-3">
-            <span>Report Scams: 1930</span>
+            <span>Report Scams: <a href="tel:1930" className="hover:text-slate-300 transition-colors">1930</a></span>
             <span className="text-slate-700">|</span>
-            <span>cybercrime.gov.in</span>
+            <a href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="hover:text-blue-400 underline decoration-slate-600 underline-offset-2 transition-colors">cybercrime.gov.in</a>
             <span className="text-slate-700">|</span>
             <span className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
