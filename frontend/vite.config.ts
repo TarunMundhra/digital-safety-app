@@ -10,4 +10,21 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: true,
+    port: 5173,
+    proxy: {
+      '/api/scam/sessions': {
+        target: 'http://backend:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/scam\/sessions/, '/api/v1/scam-sessions'),
+      },
+      '/api': {
+        target: 'http://backend:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
+      },
+    },
+  },
 })
+

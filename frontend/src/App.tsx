@@ -84,7 +84,7 @@ export default function App() {
             <KpiCards />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
-                <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-6 flex flex-col items-center">
+                <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-6 flex flex-col items-center justify-center h-full">
                   <h3 className="text-xs text-slate-400 uppercase tracking-wider mb-4">Overall Threat Level</h3>
                   <ThreatLevelGauge level={overallThreat.level} score={overallThreat.score} />
                 </div>

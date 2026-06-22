@@ -15,13 +15,41 @@ def evaluate_session(db: Session, call_session_id: str) -> dict:
     fused_risk_score = original_risk_score
     
     if entity:
+        # Check SIM activation out-degree rule
+        if entity.type == "phone_number" and entity.sim_activated_at:
+            from datetime import datetime
+            sim_age = datetime.utcnow() - entity.sim_activated_at
+            if sim_age.days <= 10:
+                from app.db.models import EntityLink, ScamSignal
+                session_count = db.query(CallSession).filter(CallSession.caller_number == caller_number).count()
+                link_count = db.query(EntityLink).filter(
+                    (EntityLink.entity_a_id == entity.id) | (EntityLink.entity_b_id == entity.id)
+                ).count()
+                out_degree = session_count + link_count
+                
+                if out_degree >= 2:
+                    existing_sig = db.query(ScamSignal).filter(
+                        ScamSignal.call_session_id == session.id,
+                        ScamSignal.signal_type == "SIM_FAN_OUT"
+                    ).first()
+                    if not existing_sig:
+                        db_sig = ScamSignal(
+                            call_session_id=session.id,
+                            signal_type="SIM_FAN_OUT",
+                            detail=f"Newly activated SIM (age {sim_age.days} days) with out-degree {out_degree}",
+                            weight=25.0
+                        )
+                        db.add(db_sig)
+                        db.flush()
+                        fused_risk_score = min(100.0, fused_risk_score + 25.0)
+
         clusters = db.query(FraudCluster).all()
         for cluster in clusters:
             if entity.id in cluster.member_entity_ids:
                 network_corroborated = True
                 cluster_id = str(cluster.id)
                 boost_factor = 1.0 + (cluster.confidence or 0.0) * 0.3
-                fused_risk_score = min(100.0, original_risk_score * boost_factor + 10)
+                fused_risk_score = min(100.0, fused_risk_score * boost_factor + 10)
                 break
                 
     # Generate recommendation

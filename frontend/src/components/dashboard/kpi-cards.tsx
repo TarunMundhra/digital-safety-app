@@ -95,7 +95,7 @@ export function KpiCards() {
           >
             <Card className={`bg-gradient-to-br ${card.gradient} border-slate-700/50 hover:border-slate-600/50 transition-colors`}>
               <CardContent className="p-4 md:p-5">
-                <div className="flex items-start justify-between">
+                <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">
                       {card.label}

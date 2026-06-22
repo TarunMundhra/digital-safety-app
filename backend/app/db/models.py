@@ -14,6 +14,7 @@ class Entity(Base):
     state_code = Column(String, index=True) # Phase 11: Jurisdiction sharding
     first_seen = Column(DateTime, default=datetime.utcnow)
     risk_score = Column(Float, default=0.0)
+    sim_activated_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -76,3 +77,5 @@ class IntelligencePackage(Base):
     package_hash = Column(String, unique=True)
     generated_at = Column(DateTime, default=datetime.utcnow)
     pdf_path = Column(String)
+    evidence_type = Column(String, nullable=True)
+    evidence_details = Column(Text, nullable=True)
