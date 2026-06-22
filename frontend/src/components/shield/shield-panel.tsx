@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,6 +69,7 @@ export function ShieldPanel() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [showHighRiskAlert, setShowHighRiskAlert] = useState(false);
   const [hotspots, setHotspots] = useState<any[]>([]);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Fetch hotspots to display on the threat map
   useEffect(() => {
@@ -100,8 +101,14 @@ export function ShieldPanel() {
       if (data.riskScore > 70) {
         setShowHighRiskAlert(true);
       }
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     } catch {
       setResult({ verdict: 'Analysis failed. Please try again.', nextSteps: '', riskScore: 0, matchedSignals: [], threatLevel: 'LOW' });
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     } finally {
       setLoading(false);
     }
@@ -179,12 +186,21 @@ export function ShieldPanel() {
                     <Button
                       onClick={() => analyze()}
                       disabled={loading || !transcript.trim()}
-                      className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-medium text-xs py-1.5 h-8 shadow-lg shadow-emerald-500/20"
+                      className={`w-full font-medium text-xs py-1.5 h-8 shadow-lg transition-all duration-300 ${
+                        result && !loading 
+                          ? 'bg-slate-800 text-emerald-400 border border-emerald-500/30 hover:bg-slate-700' 
+                          : 'bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white shadow-emerald-500/20'
+                      }`}
                     >
                       {loading ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                           Analyzing...
+                        </>
+                      ) : result ? (
+                        <>
+                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                          Analysis Complete - Scroll Down
                         </>
                       ) : (
                         <>
@@ -218,6 +234,7 @@ export function ShieldPanel() {
               <AnimatePresence mode="wait">
                 {result && !loading && (
                   <motion.div
+                    ref={resultsRef}
                     key="result"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
