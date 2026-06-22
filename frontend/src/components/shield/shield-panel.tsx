@@ -84,15 +84,16 @@ export function ShieldPanel() {
     loadHotspots();
   }, []);
 
-  const analyze = async () => {
-    if (!transcript.trim()) return;
+  const analyze = async (transcriptToAnalyze?: string) => {
+    const text = transcriptToAnalyze || transcript;
+    if (!text.trim()) return;
     setLoading(true);
     setResult(null);
     try {
       const res = await fetch('/api/shield/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: transcript }),
+        body: JSON.stringify({ description: text }),
       });
       const data = await res.json();
       setResult(data);
@@ -105,6 +106,24 @@ export function ShieldPanel() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const targetTranscript = localStorage.getItem('shield_target_transcript');
+    const targetCaller = localStorage.getItem('shield_target_caller');
+    const targetVideo = localStorage.getItem('shield_target_video');
+
+    if (targetTranscript) {
+      setTranscript(targetTranscript);
+      if (targetCaller) setCallerNumber(targetCaller);
+      if (targetVideo) setIsVideo(targetVideo === 'true');
+      
+      localStorage.removeItem('shield_target_transcript');
+      localStorage.removeItem('shield_target_caller');
+      localStorage.removeItem('shield_target_video');
+      
+      analyze(targetTranscript);
+    }
+  }, []);
 
   const loadSample = (text: string) => {
     setTranscript(text);
@@ -158,7 +177,7 @@ export function ShieldPanel() {
                     </div>
 
                     <Button
-                      onClick={analyze}
+                      onClick={() => analyze()}
                       disabled={loading || !transcript.trim()}
                       className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-medium text-xs py-1.5 h-8 shadow-lg shadow-emerald-500/20"
                     >

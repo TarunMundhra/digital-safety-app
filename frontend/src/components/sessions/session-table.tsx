@@ -94,6 +94,13 @@ export function SessionTable() {
     window.location.hash = '#/fusion';
   };
 
+  const handleDetails = (session: SessionRow) => {
+    localStorage.setItem('shield_target_transcript', session.transcriptText || '');
+    localStorage.setItem('shield_target_caller', session.callerNumber || '');
+    localStorage.setItem('shield_target_video', session.isVideo ? 'true' : 'false');
+    window.location.hash = '#/shield';
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
       <Card className="bg-slate-900/50 border-slate-700/50">
@@ -174,10 +181,7 @@ export function SessionTable() {
                   {filtered.map((session, i) => (
                     <TableRow
                       key={session.id}
-                      className={`border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors ${
-                        selectedSession?.id === session.id ? 'bg-slate-800/60' : ''
-                      }`}
-                      onClick={() => setSelectedSession(selectedSession?.id === session.id ? null : session)}
+                      className="border-slate-800/50 hover:bg-slate-800/30 transition-colors"
                     >
                       <TableCell className="py-2.5 text-xs font-mono text-slate-400 max-w-[80px] truncate">
                         {session.id.slice(0, 8)}...
@@ -231,12 +235,12 @@ export function SessionTable() {
                       <TableCell className="py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1 justify-end">
                           <Button
-                            variant={selectedSession?.id === session.id ? "default" : "outline"}
+                            variant="outline"
                             size="sm"
                             className="h-7 px-2 text-[11px] border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedSession(selectedSession?.id === session.id ? null : session);
+                              handleDetails(session);
                             }}
                           >
                             <Eye className="h-3 w-3 mr-1" /> Details
@@ -261,38 +265,7 @@ export function SessionTable() {
             )}
           </ScrollArea>
 
-          {/* Detail Panel */}
-          {selectedSession && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="border-t border-slate-700/50 bg-slate-800/30 p-4"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-xs font-medium text-slate-400 mb-2">TRANSCRIPT</h4>
-                  <p className="text-xs text-slate-300 bg-slate-900/50 rounded p-3 max-h-32 overflow-y-auto leading-relaxed">
-                    {selectedSession.transcriptText || 'No transcript available'}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-xs font-medium text-slate-400 mb-2">DETECTED SIGNALS ({selectedSession.signals?.length || 0})</h4>
-                  <div className="space-y-1.5 max-h-32 overflow-y-auto">
-                    {selectedSession.signals?.map((sig, i) => (
-                      <div key={i} className="flex items-center justify-between bg-slate-900/50 rounded px-2.5 py-1.5">
-                        <span className="text-[11px] text-slate-300">{sig.signalType}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-slate-500 max-w-[200px] truncate hidden sm:block">{sig.detail}</span>
-                          <Badge variant="outline" className="text-[10px] border-rose-500/30 text-rose-400 h-4 px-1">{sig.weight.toFixed(0)}</Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {/* Detail Panel Removed: Now redirects to Shield page */}
         </CardContent>
       </Card>
     </motion.div>
