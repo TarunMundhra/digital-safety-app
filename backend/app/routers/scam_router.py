@@ -45,6 +45,7 @@ def get_sessions(
             "isVideo": s.is_video,
             "riskScore": s.risk_score,
             "status": s.status,
+            "transcriptText": s.transcript_text,
             "createdAt": s.created_at.isoformat() if s.created_at else None,
             "signals": [
                 {
