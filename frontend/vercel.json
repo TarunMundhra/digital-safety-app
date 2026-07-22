@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/scam/sessions/:path*",
+      "destination": "https://digital-safety-backend.onrender.com/api/v1/scam-sessions/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://digital-safety-backend.onrender.com/api/v1/:path*"
+    }
+  ]
+}
