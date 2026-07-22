@@ -2,7 +2,19 @@
 
 > Transforming isolated fraud reports into actionable cybercrime intelligence.
 
-A state-of-the-art digital safety and fraud prevention platform that combines AI-powered transcript analysis, graph intelligence, geospatial telemetry, and threat fusion to identify, correlate, and disrupt organized digital fraud operations such as Digital Arrest scams, Customs impersonation campaigns, phishing infrastructure, and coordinated financial crime networks.
+[![Live App](https://img.shields.io/badge/Production-Live%20App-brightgreen?style=for-the-badge&logo=vercel)](https://digital-safety-app.vercel.app)
+[![API Status](https://img.shields.io/badge/API-Render%20Live-blue?style=for-the-badge&logo=render)](https://digital-safety-backend.onrender.com)
+[![Swagger Docs](https://img.shields.io/badge/Docs-Swagger%20UI-orange?style=for-the-badge&logo=fastapi)](https://digital-safety-backend.onrender.com/docs)
+
+A state-of-the-art digital safety and fraud prevention platform that combines AI-powered transcript analysis, graph intelligence, geospatial telemetry, counterfeit currency detection, and threat fusion to identify, correlate, and disrupt organized digital fraud operations such as Digital Arrest scams, Customs impersonation campaigns, fake note circulation, phishing infrastructure, and coordinated financial crime networks.
+
+---
+
+### 🌐 Live Production Deployments
+
+* 🚀 **Web Application (Vercel)**: [https://digital-safety-app.vercel.app](https://digital-safety-app.vercel.app)
+* ⚡ **API Engine (Render)**: [https://digital-safety-backend.onrender.com](https://digital-safety-backend.onrender.com)
+* 📖 **Swagger OpenAPI Documentation**: [https://digital-safety-backend.onrender.com/docs](https://digital-safety-backend.onrender.com/docs)
 
 ---
 
@@ -16,6 +28,7 @@ A single fraud operation often involves:
 * Disposable SIM cards
 * UPI identifiers
 * Mule bank accounts
+* Counterfeit currency circulation networks
 * Phishing domains
 * Victims distributed across multiple states
 
@@ -33,11 +46,11 @@ The Digital Public Safety Intelligence Platform (DPSIP) introduces an intelligen
 
 Instead of analyzing incidents independently, the platform continuously correlates:
 
-* Citizen reports
-* Conversation transcripts
-* Financial identifiers
-* Geographic activity
-* Network relationships
+* Citizen reports & Call Transcripts
+* Counterfeit Note & Physical Currency Signals
+* Financial identifiers (UPI, Bank Accounts)
+* Geographic activity & Hotspot Density
+* Network relationships & Community Clusters
 * Threat intelligence feeds
 
 to uncover hidden criminal infrastructure and generate actionable intelligence.
@@ -62,10 +75,10 @@ An AI-assisted fraud analysis engine that evaluates suspicious conversations and
 
 ### Powered By
 
-* FastEmbed
-* ONNX Runtime
+* FastEmbed (`BAAI/bge-small-en-v1.5`)
+* ONNX Runtime (384-dimensional vector space)
 * Heuristic NLP signal extraction
-* Vector similarity search
+* Cosine vector similarity search
 
 ### Output
 
@@ -73,6 +86,32 @@ An AI-assisted fraud analysis engine that evaluates suspicious conversations and
 * Risk classification
 * Triggered scam indicators
 * Recommended next actions
+
+---
+
+## 💵 Counterfeit Note & Currency Intelligence Engine
+
+A physical and digital currency verification module that detects fake and counterfeit banknotes circulating within financial networks.
+
+### Detects
+
+* Counterfeit ₹500 & ₹2000 denomination notes
+* Security thread misalignment and missing fluorescent ink patterns
+* Micro-lettering & watermark anomalies (`RBI`, `500`)
+* Serial number font distortion and duplicate serial number syndicates
+* Intaglio printing texture variations and bleed artifacts
+
+### Powered By
+
+* Multi-feature visual & structural feature extractors
+* High-precision pattern alignment algorithms
+* Cross-referencing against reported counterfeit serial number databases
+
+### Output
+
+* Counterfeit Risk Score & Authenticity Verdict
+* Highlighted anomaly feature points
+* Automatic link generation to known currency forging syndicates in the Graph Engine
 
 ---
 
@@ -102,14 +141,14 @@ The platform reconstructs connections between:
 * Bank Accounts
 * PAN Numbers
 * Aadhaar Identifiers
-* Devices
+* Devices & Counterfeit Note Serial Syndicates
 
 Using NetworkX and Louvain community detection, the system identifies coordinated fraud rings and co-accused clusters.
 
 ### Capabilities
 
 * Connected component analysis
-* Community detection
+* Community detection (Louvain modularity optimization)
 * Fraud cluster generation
 * Cross-state network discovery
 
@@ -117,69 +156,50 @@ Using NetworkX and Louvain community detection, the system identifies coordinate
 
 ## 🧠 Agentic Fusion Engine
 
-Individual signals are often weak.
-
-Combined signals reveal intent.
+Individual signals are often weak. Combined signals reveal intent.
 
 The Fusion Engine correlates:
 
 * NLP threat indicators
+* Counterfeit currency report signals
 * Graph intelligence
-* SIM activation age
-* Network fan-out behavior
+* SIM activation age & out-degree fan-out rates
 * Historical risk scores
 
 to generate a unified intelligence score and escalation recommendation.
-
-Example:
-
-A newly activated SIM associated with multiple fraud clusters automatically receives elevated risk weighting and triggers immediate escalation recommendations.
-
----
-
-## 📊 Observability & Monitoring
-
-The platform includes a complete monitoring stack.
-
-### Components
-
-* Prometheus Metrics Collection
-* Grafana Dashboards
-* Service Health Monitoring
-* Performance Telemetry
-
-This provides complete visibility into system behavior and operational performance.
 
 ---
 
 # 🏗 System Architecture
 
 ```text
-Citizen Reports
+Citizen Reports / Note Images
        │
        ▼
- Citizen Shield
-       │
- ┌─────┴─────┐
- ▼           ▼
-NLP      Embeddings
-Engine     Engine
- │           │
- └─────┬─────┘
-       ▼
- Fusion Engine
-       │
- ┌─────┼────────────┐
- ▼     ▼            ▼
-Graph  Geo      Intelligence
-AI     AI       Generation
- │      │
- └──────┴────────────┐
-                     ▼
- PostgreSQL + PostGIS + pgvector
-                     │
-                     ▼
-                   Redis
+ ┌───────────────┐
+ │ Citizen Shield│
+ └───────┬───────┘
+         │
+ ┌───────┴───────┬─────────────────────────┐
+ ▼               ▼                         ▼
+NLP        FastEmbed               Counterfeit Currency
+Engine     Vector Engine           Detection Engine
+ │               │                         │
+ └───────┬───────┴─────────────────────────┘
+         ▼
+   Fusion Engine
+         │
+ ┌───────┼────────────┐
+ ▼       ▼            ▼
+Graph    Geo      Intelligence
+AI       AI       Generation
+ │        │
+ └────────┴───────────┐
+                      ▼
+   PostgreSQL + PostGIS + pgvector
+                      │
+                      ▼
+                    Redis
 ```
 
 ---
@@ -188,8 +208,7 @@ AI     AI       Generation
 
 ## Frontend
 
-* React
-* TypeScript
+* React & TypeScript
 * Vite
 * Tailwind CSS
 * Leaflet Maps
@@ -197,170 +216,49 @@ AI     AI       Generation
 ## Backend
 
 * FastAPI
-* SQLAlchemy
-* GeoAlchemy2
-* FastEmbed
-* NetworkX
-* ReportLab
+* SQLAlchemy & GeoAlchemy2
+* FastEmbed (ONNX Runtime)
+* NetworkX & python-louvain
+* ReportLab (PDF Intelligence Package Generator)
 
 ## Data Layer
 
-* PostgreSQL
-* PostGIS
-* pgvector
-* Redis
-
-## DevOps & Monitoring
-
-* Docker Compose
-* Prometheus
-* Grafana
-
----
-
-# 📂 Project Structure
-
-```bash
-digitalSafety/
-├── backend/
-│   ├── app/
-│   │   ├── core/
-│   │   ├── db/
-│   │   ├── routers/
-│   │   ├── services/
-│   │   └── main.py
-│   ├── scripts/
-│   ├── Dockerfile
-│   ├── db.Dockerfile
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── src/
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── tailwind.config.js
-│
-├── docker-compose.yml
-├── prometheus.yml
-└── README.md
-```
+* PostgreSQL + PostGIS + pgvector
+* Redis (Sub-millisecond caching)
 
 ---
 
 # 📡 API Overview
 
-### Citizen Shield
+### Live Production Base URL
+`https://digital-safety-backend.onrender.com`
 
-```http
-POST /api/v1/shield/check
-```
-
-Analyze suspicious call transcripts and generate fraud risk assessments.
-
----
-
-### Geospatial Intelligence
-
-```http
-GET /api/v1/geo/hotspots?days=30
-```
-
-Retrieve aggregated fraud hotspots and regional threat distributions.
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/v1/shield/check` | `POST` | Analyze suspicious call transcripts & calculate risk score |
+| `/api/v1/geo/hotspots` | `GET` | Retrieve regional fraud hotspot density across India |
+| `/api/v1/graph/clusters` | `GET` | Detect Louvain community clusters & fraud syndicates |
+| `/api/v1/graph/cross-state` | `GET` | Identify multi-state cross-jurisdiction fraud rings |
+| `/api/v1/fusion/evaluate` | `POST` | Perform multi-signal threat fusion & escalation analysis |
+| `/api/v1/seed/all` | `POST` | Pre-populate database with rich demonstration dataset |
 
 ---
 
-### Graph Intelligence
-
-```http
-GET /api/v1/graph/clusters
-POST /api/v1/graph/detect
-GET /api/v1/graph/cross-state
-POST /api/v1/graph/intel-package/{cluster_id}
-```
-
-Generate network intelligence and investigation packages.
-
----
-
-### Agentic Fusion
-
-```http
-POST /api/v1/fusion/evaluate
-POST /api/v1/fusion/evaluate/{call_session_id}
-```
-
-Perform multi-signal threat fusion and escalation analysis.
-
----
-
-# 🚀 Getting Started
-
-## Start the Platform
+# 🚀 Local Setup & Installation
 
 ```bash
+# 1. Clone repository
+git clone https://github.com/TarunMundhra/digital-safety-app.git
+cd digital-safety-app
+
+# 2. Run full stack with Docker Compose
 docker compose up -d --build
 ```
 
-## Seed Sample Data
+### Access Local Services
 
-```bash
-docker compose exec backend python scripts/seed/generate_scam_transcripts.py
-```
-
-## Access Services
-
-| Service            | URL                        |
-| ------------------ | -------------------------- |
-| Frontend Dashboard | http://localhost:5173      |
-| FastAPI Docs       | http://localhost:8000/docs |
-| Prometheus         | http://localhost:9090      |
-| Grafana            | http://localhost:3000      |
-
----
-
-# 🎯 Impact
-
-### Citizens
-
-* Early scam detection
-* Safer reporting experience
-* Reduced financial losses
-
-### Financial Institutions
-
-* Brand abuse monitoring
-* Phishing infrastructure discovery
-* Threat intelligence enrichment
-
-### Law Enforcement
-
-* Fraud ring identification
-* Cross-state investigations
-* Automated intelligence reports
-
-### Government Agencies
-
-* National fraud visibility
-* Data-driven intervention
-* Emerging threat detection
-
----
-
-# 🔮 Future Roadmap
-
-* Real-time call analysis
-* Voice-to-intelligence pipelines
-* Multilingual scam detection
-* National fraud intelligence exchange
-* Predictive fraud forecasting
-* Automated inter-agency escalation
-
----
-
-## Vision
-
-Cybercrime investigations should not begin after damage has already occurred.
-
-Our vision is to create an intelligence layer capable of detecting, correlating, and disrupting organized fraud networks before additional victims are affected.
-
-**From incident reporting to intelligence-driven public safety.**
+| Service | Local URL | Production URL |
+| :--- | :--- | :--- |
+| **Frontend App** | `http://localhost:5173` | [https://digital-safety-app.vercel.app](https://digital-safety-app.vercel.app) |
+| **FastAPI Backend** | `http://localhost:8000` | [https://digital-safety-backend.onrender.com](https://digital-safety-backend.onrender.com) |
+| **Swagger API Docs** | `http://localhost:8000/docs` | [https://digital-safety-backend.onrender.com/docs](https://digital-safety-backend.onrender.com/docs) |
