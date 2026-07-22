@@ -3,7 +3,85 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Dark command-center theme (single theme app) */
+    --background: 224 71% 4%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 224 60% 6%;
+    --popover-foreground: 210 40% 96%;
+
+    /* Emerald / teal = trust */
+    --primary: 160 84% 39%;
+    --primary-foreground: 150 30% 98%;
+
+    --secondary: 217 33% 15%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 217 33% 14%;
+    --muted-foreground: 215 20% 62%;
+
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 96%;
+
+    /* Rose = danger */
+    --destructive: 350 89% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 28% 20%;
+    --input: 215 28% 20%;
+    --ring: 160 84% 39%;
+
+    --radius: 0.75rem;
+
+    /* India tricolor secondary accents */
+    --saffron: 30 100% 60%;
+    --india: 130 68% 42%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
   body {
-    @apply bg-slate-950 text-slate-100;
+    @apply bg-background text-foreground font-sans antialiased;
+    /* Layered command-center backdrop: tricolor-tinted radial glows + faint grid */
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(60rem 40rem at 15% -10%, hsl(var(--saffron) / 0.06), transparent 60%),
+      radial-gradient(55rem 40rem at 100% 0%, hsl(var(--india) / 0.07), transparent 55%),
+      radial-gradient(70rem 50rem at 50% 120%, hsl(var(--primary) / 0.06), transparent 60%),
+      linear-gradient(to right, hsl(215 28% 20% / 0.35) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(215 28% 20% / 0.35) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  /* Saffron -> white -> green hairline (India tricolor cue) */
+  .tricolor-strip {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--saffron)) 0%,
+      hsl(var(--saffron)) 33%,
+      #ffffff 33%,
+      #ffffff 66%,
+      hsl(var(--india)) 66%,
+      hsl(var(--india)) 100%
+    );
+  }
+
+  /* Glassy elevated surface used by cards/panels */
+  .glass-panel {
+    background-color: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }

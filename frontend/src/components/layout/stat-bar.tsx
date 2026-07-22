@@ -16,27 +16,27 @@ export function StatBar() {
   }, []);
 
   return (
-    <div className="border-b border-slate-800/50 bg-slate-950/50">
-      <div className="px-4 md:px-6 py-1.5 flex items-center gap-6 text-[11px] text-slate-500 overflow-x-auto">
+    <div className="border-b border-border/50 bg-background/30">
+      <div className="px-4 md:px-6 py-1.5 flex items-center gap-6 text-[11px] text-muted-foreground overflow-x-auto">
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <Activity className="h-3 w-3 text-emerald-500" />
-          <span>Real-time Monitoring</span>
+          <Activity className="h-3 w-3 text-primary" />
+          <span>Real-time monitoring</span>
         </div>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <Database className="h-3 w-3" />
-          <span>SQLite Connected</span>
+          <Database className="h-3 w-3 text-india" />
+          <span>PostgreSQL connected</span>
         </div>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <Globe className="h-3 w-3" />
-          <span>28 States Monitored</span>
+          <Globe className="h-3 w-3 text-saffron" />
+          <span>28 states monitored</span>
         </div>
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <Shield className="h-3 w-3 text-amber-500" />
-          <span>Scam Detection Engine Active</span>
+          <Shield className="h-3 w-3 text-primary" />
+          <span>Scam detection engine active</span>
         </div>
         <div className="ml-auto flex items-center gap-1.5 whitespace-nowrap font-mono">
-          <span className="text-slate-600">IST</span>
-          <span className="text-slate-400">{time}</span>
+          <span className="text-muted-foreground/60">IST</span>
+          <span className="text-foreground/70">{time}</span>
         </div>
       </div>
     </div>

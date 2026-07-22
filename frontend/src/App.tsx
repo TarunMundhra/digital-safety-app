@@ -7,6 +7,7 @@ import { ThreatLevelGauge } from '@/components/dashboard/threat-level-gauge';
 import { RecentAlerts } from '@/components/dashboard/recent-alerts';
 import { TrendChart } from '@/components/dashboard/trend-chart';
 import { ShieldPanel } from '@/components/shield/shield-panel';
+import { NoteVerifyPanel } from '@/components/note/note-verify-panel';
 import { SessionTable } from '@/components/sessions/session-table';
 import { NetworkGraph } from '@/components/graph/network-graph';
 import { HotspotMap } from '@/components/geo/hotspot-map';
@@ -21,7 +22,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#/', '').replace('#', '');
-      const validTabs = ['dashboard', 'shield', 'sessions', 'graph', 'hotspots', 'fusion'];
+      const validTabs = ['dashboard', 'shield', 'note', 'sessions', 'graph', 'hotspots', 'fusion'];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else {
@@ -84,8 +85,8 @@ export default function App() {
             <KpiCards />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
-                <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl p-6 flex flex-col items-center justify-center h-full">
-                  <h3 className="text-xs text-slate-400 uppercase tracking-wider mb-4">Overall Threat Level</h3>
+                <div className="glass-panel border border-border/70 rounded-xl p-6 flex flex-col items-center justify-center h-full shadow-lg shadow-black/20">
+                  <h3 className="text-xs text-muted-foreground uppercase tracking-wider mb-4">Overall Threat Level</h3>
                   <ThreatLevelGauge level={overallThreat.level} score={overallThreat.score} />
                 </div>
               </div>
@@ -94,8 +95,8 @@ export default function App() {
               </div>
             </div>
             <div>
-              <h3 className="text-xs text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
+              <h3 className="text-xs text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
                 Recent Alerts
               </h3>
               <RecentAlerts />
@@ -104,6 +105,8 @@ export default function App() {
         );
       case 'shield':
         return <ShieldPanel />;
+      case 'note':
+        return <NoteVerifyPanel />;
       case 'sessions':
         return <SessionTable />;
       case 'graph':
@@ -118,27 +121,27 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen text-foreground flex flex-col">
       <AppHeader />
       <StatBar />
       <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       <main className="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full">
         {renderTabContent()}
       </main>
-      <footer className="border-t border-slate-800/50 bg-slate-950 py-3 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
+      <footer className="border-t border-border/50 bg-background/40 py-3 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-muted-foreground">
           <div className="flex items-center gap-2">
             <span>PSCI Platform v2.0</span>
-            <span className="text-slate-700">|</span>
+            <span className="text-border">|</span>
             <span>Digital Public Safety Intelligence</span>
           </div>
           <div className="flex items-center gap-3">
-            <span>Report Scams: <a href="tel:1930" className="hover:text-slate-300 transition-colors">1930</a></span>
-            <span className="text-slate-700">|</span>
-            <a href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="hover:text-blue-400 underline decoration-slate-600 underline-offset-2 transition-colors">cybercrime.gov.in</a>
-            <span className="text-slate-700">|</span>
+            <span>Report Scams: <a href="tel:1930" className="text-foreground/80 hover:text-primary transition-colors">1930</a></span>
+            <span className="text-border">|</span>
+            <a href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="hover:text-primary underline decoration-border underline-offset-2 transition-colors">cybercrime.gov.in</a>
+            <span className="text-border">|</span>
             <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-india" />
               All systems operational
             </span>
           </div>

@@ -213,12 +213,12 @@ export function ShieldPanel() {
             <div className="space-y-6 pb-6">
               {/* Input Panel */}
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-                <Card className="bg-slate-900/50 border-slate-700/50">
+                <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <ShieldCheck className="h-5 w-5 text-emerald-400" />
-                        <CardTitle className="text-base text-slate-200">Citizen Fraud Shield</CardTitle>
+                        <ShieldCheck className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-base text-foreground">Citizen Fraud Shield</CardTitle>
                       </div>
                       
                       <Dialog open={reportOpen} onOpenChange={setReportOpen}>
@@ -317,7 +317,7 @@ export function ShieldPanel() {
                         </DialogContent>
                       </Dialog>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Enter the call transcript you received. Our AI engine will analyze it for known scam patterns.
                     </p>
                   </CardHeader>
@@ -406,7 +406,7 @@ export function ShieldPanel() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <Card className="bg-slate-900/50 border-slate-700/50">
+                    <Card>
                       <CardHeader className="pb-2">
                         <div className="flex items-center gap-2">
                           {result.riskScore > 70 ? (
@@ -416,7 +416,7 @@ export function ShieldPanel() {
                           ) : (
                             <CheckCircle2 className="h-5 w-5 text-emerald-400" />
                           )}
-                          <CardTitle className="text-base text-slate-200">Analysis Results</CardTitle>
+                          <CardTitle className="text-base text-foreground">Analysis Results</CardTitle>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -514,13 +514,13 @@ export function ShieldPanel() {
 
         {/* Right Column: Interactive Map Area (60% width / 3 cols) */}
         <div className="lg:col-span-3 h-full">
-          <Card className="bg-slate-900/50 border-slate-700/50 overflow-hidden h-full flex flex-col lg:h-[620px]">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <Card className="overflow-hidden h-full flex flex-col lg:h-[620px] p-0 gap-0">
+            <div className="p-4 border-b border-border/60 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-                <h3 className="text-sm font-semibold text-slate-200">Threat Geospatial Distribution</h3>
+                <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+                <h3 className="text-sm font-semibold text-foreground">Threat Geospatial Distribution</h3>
               </div>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[10px] text-muted-foreground">
                 {hotspots.length} Active Hotspot Areas
               </span>
             </div>
