@@ -40,10 +40,11 @@ app.include_router(shield_router.router, prefix="/api/v1/shield", tags=["Citizen
 app.include_router(seed_router.router, prefix="/api/v1/seed", tags=["Database Seeding"])
 app.include_router(partners_router.router, prefix="/api/v1/partners", tags=["Partners"])
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {"status": "healthy", "service": "Digital Public Safety Intelligence Platform API"}
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy"}
+
