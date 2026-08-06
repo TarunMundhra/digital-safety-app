@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, ShieldAlert, Loader2, Phone, Video, AlertTriangle, CheckCircle2, Info, ChevronRight, AlertOctagon } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Loader2, Phone, Video, AlertTriangle, CheckCircle2, Info, ChevronRight, AlertOctagon, Database, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -61,6 +61,13 @@ interface AnalysisResult {
   threatLevel: string;
 }
 
+interface DeepAnalysis {
+  session_id: string;
+  risk_score: number;
+  matched_signals: { signal_type: string; detail: string; weight: number }[];
+  recommendation: string;
+}
+
 const SAMPLE_TRANSCRIPTS = [
   {
     label: 'Digital Arrest Scam',
@@ -95,6 +102,8 @@ export function ShieldPanel() {
   const [isVideo, setIsVideo] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [deepResult, setDeepResult] = useState<DeepAnalysis | null>(null);
+  const [deepLoading, setDeepLoading] = useState(false);
   const [showHighRiskAlert, setShowHighRiskAlert] = useState(false);
   const [hotspots, setHotspots] = useState<any[]>([]);
   const [reportOpen, setReportOpen] = useState(false);
@@ -198,6 +207,31 @@ export function ShieldPanel() {
       analyze(targetTranscript);
     }
   }, []);
+
+  const deepScan = async () => {
+    if (!transcript.trim() || !callerNumber.trim()) return;
+    setDeepLoading(true);
+    setDeepResult(null);
+    try {
+      // Network + cache path: hits the Redis-backed analyze endpoint.
+      const res = await fetch('/api/scam/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript,
+          caller_number: callerNumber,
+          is_video: isVideo,
+          duration: 1200,
+        }),
+      });
+      const data = await res.json();
+      setDeepResult(data);
+    } catch {
+      setDeepResult(null);
+    } finally {
+      setDeepLoading(false);
+    }
+  };
 
   const loadSample = (text: string) => {
     setTranscript(text);
@@ -374,6 +408,53 @@ export function ShieldPanel() {
                         </>
                       )}
                     </Button>
+
+                    {/* Deep Scan — exercises the network + Redis known-bad cache */}
+                    <Button
+                      onClick={deepScan}
+                      disabled={deepLoading || !transcript.trim() || !callerNumber.trim()}
+                      variant="outline"
+                      className="w-full h-8 text-xs border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
+                    >
+                      {deepLoading ? (
+                        <><Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />Running network + cache scan…</>
+                      ) : (
+                        <><Database className="h-3.5 w-3.5 mr-2" />Deep Scan (Network + Cache)</>
+                      )}
+                    </Button>
+                    {!callerNumber.trim() && (
+                      <p className="text-[10px] text-muted-foreground -mt-2">
+                        Enter a caller number above to enable deep scan — it checks the known-bad Redis cache for that number.
+                      </p>
+                    )}
+
+                    {deepResult && (
+                      <div className="rounded-lg border border-primary/25 bg-primary/5 p-2.5 space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                            <Database className="h-3.5 w-3.5 text-primary" />
+                            Network + Cache Scan
+                          </span>
+                          {deepResult.recommendation?.toLowerCase().includes('cached') ? (
+                            <Badge variant="outline" className="text-[9px] border-saffron/40 text-saffron bg-saffron/10">
+                              <Zap className="h-2.5 w-2.5" />
+                              Served from Redis cache
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[9px] border-india/40 text-india bg-india/10">
+                              Freshly computed
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          Risk <span className="text-foreground font-semibold tabular-nums">{deepResult.risk_score}</span>
+                          {' · '}{deepResult.recommendation}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground/70">
+                          Run this again with the same caller number to see it resolve instantly from the cache.
+                        </p>
+                      </div>
+                    )}
 
                     <Separator className="bg-slate-800" />
 
