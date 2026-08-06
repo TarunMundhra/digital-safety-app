@@ -46,5 +46,6 @@ def root():
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 def health_check():
-    return {"status": "healthy"}
+    from app.services.scam_service import cache_ping
+    return {"status": "healthy", "redis": cache_ping()}
 

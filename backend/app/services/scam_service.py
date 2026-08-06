@@ -1,5 +1,6 @@
 import re
 import json
+import logging
 import redis
 from sqlalchemy.orm import Session
 from app.db.models import CallSession, ScamSignal, Entity
@@ -7,8 +8,51 @@ from fastembed import TextEmbedding
 import numpy as np
 from app.core.config import settings
 
-# Phase 11: Redis cache for known-bad lookups
-redis_client = redis.from_url(settings.REDIS_URL)
+logger = logging.getLogger(__name__)
+
+# Phase 11: Redis cache for known-bad lookups.
+# Best-effort only: the cache is a pure optimization, so any Redis failure
+# (unreachable host, archived Upstash DB, timeout) degrades to a normal
+# recompute instead of crashing the request. Short socket timeouts fail fast.
+try:
+    redis_client = redis.from_url(
+        settings.REDIS_URL,
+        socket_connect_timeout=2,
+        socket_timeout=2,
+    )
+except Exception as exc:  # malformed REDIS_URL etc.
+    logger.warning("Redis client init failed, caching disabled: %s", exc)
+    redis_client = None
+
+
+def cache_is_known_bad(cache_key: str) -> bool:
+    if redis_client is None:
+        return False
+    try:
+        return bool(redis_client.exists(cache_key))
+    except redis.RedisError as exc:
+        logger.warning("Redis lookup failed, treating as cache miss: %s", exc)
+        return False
+
+
+def cache_flag_known_bad(cache_key: str, ttl: int = 3600) -> None:
+    if redis_client is None:
+        return
+    try:
+        redis_client.setex(cache_key, ttl, "high_risk")
+    except redis.RedisError as exc:
+        logger.warning("Redis write failed, skipping cache: %s", exc)
+
+
+def cache_ping() -> str:
+    """Best-effort cache status for health checks: 'up' | 'down' | 'disabled'."""
+    if redis_client is None:
+        return "disabled"
+    try:
+        redis_client.ping()
+        return "up"
+    except redis.RedisError:
+        return "down"
 
 # Phase 3: FastEmbed (ONNX, CPU-friendly, no PyTorch)
 embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
@@ -50,7 +94,7 @@ def calculate_embedding_score(transcript: str) -> float:
 def analyze_session(db: Session, transcript: str, caller_number: str, is_video: bool, duration: int, state_code: str = "DL") -> dict:
     # Phase 11: Check Redis cache first for known-bad actor
     cache_key = f"known_bad:{caller_number}"
-    if redis_client.exists(cache_key):
+    if cache_is_known_bad(cache_key):
         risk_score = 95.0
         recommendation = "Immediate escalation (Cached known-bad actor)"
     else:
@@ -61,9 +105,9 @@ def analyze_session(db: Session, transcript: str, caller_number: str, is_video: 
         risk_score = min(100.0, rule_score + embedding_score)
         recommendation = "Immediate escalation to Cybercrime unit" if risk_score > 80 else "Monitor"
         
-        # Cache if high risk
+        # Cache if high risk (best-effort)
         if risk_score > 80:
-            redis_client.setex(cache_key, 3600, "high_risk")
+            cache_flag_known_bad(cache_key)
 
     db_session = CallSession(
         caller_number=caller_number,
